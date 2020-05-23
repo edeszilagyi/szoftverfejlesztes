@@ -197,7 +197,7 @@ public class GameController {
 
     public void click(int row, int col){
 
-        if(flag)
+        if(flag && !grid[row][col].isOpen)
             grid[row][col].hasFlag=!grid[row][col].hasFlag;
         else {
             if (grid[row][col].isOpen || grid[row][col].hasFlag)
