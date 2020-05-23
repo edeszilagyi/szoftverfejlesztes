@@ -13,16 +13,11 @@
             <Font size="37.0" />
          </font>
       </Label>
-      <Button fx:id="startButtonEasy" layoutX="275.0" layoutY="281.0" mnemonicParsing="false" onAction="#startEasy" prefHeight="51.0" prefWidth="137.0" text="Easy">
+      <Button fx:id="startButton" layoutX="275.0" layoutY="281.0" mnemonicParsing="false" onAction="#startAction" prefHeight="51.0" prefWidth="137.0" text="START">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
-      <Label layoutX="160.0" layoutY="232.0" prefHeight="39.0" prefWidth="221.0" text="Difficulty:">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
       <Label layoutX="160.0" layoutY="147.0" prefHeight="45.0" prefWidth="81.0" text="Username:">
          <font>
             <Font size="16.0" />

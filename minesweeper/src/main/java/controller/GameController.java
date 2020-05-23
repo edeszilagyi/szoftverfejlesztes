@@ -14,7 +14,7 @@ import javafx.scene.layout.GridPane;
 import java.util.Arrays;
 import java.util.List;
 
-public class EasyGameController {
+public class GameController {
 
     //private tileState gameState;
     //private Instant beginGame;
@@ -24,6 +24,7 @@ public class EasyGameController {
     private static final int X_TILES=10;
     private static final int Y_TILES=10;
     public boolean finished;
+    public boolean flag;
 
     public Tile[][] grid= new Tile[X_TILES][Y_TILES];
 
@@ -37,21 +38,17 @@ public class EasyGameController {
     private Label stepLabel;
 
     @FXML
-    private Label xLabel;
-
-    @FXML
-    private Label yLabel;
-
-    @FXML
-    private Label mineLabel;
-
-    @FXML
     private Label gameResult;
+
+    public void checkFlag(ActionEvent actionEvent) {
+        flag=!flag;
+    }
 
     public class Tile{
         private int x,y;
         private boolean hasBomb;
         private boolean isOpen = false;
+        private boolean hasFlag = false;
         private int bombs=0;
 
         public Tile(int x,int y, boolean hasBomb){
@@ -122,8 +119,10 @@ public class EasyGameController {
 
         for (int x = 1; x < X_TILES; x++) {
             for (int y = 1; y < Y_TILES; y++) {
-                int number=1;
-                if(!grid[x][y].isOpen)
+                int number;
+                if(grid[x][y].hasFlag)
+                    number=8;
+                else if(!grid[x][y].isOpen)
                     number=1;
                 else if(grid[x][y].hasBomb)
                     number=0;
@@ -165,10 +164,26 @@ public class EasyGameController {
                 new Image(getClass().getResource("/pictures/tile2.png").toExternalForm()),
                 new Image(getClass().getResource("/pictures/tile3.png").toExternalForm()),
                 new Image(getClass().getResource("/pictures/tile4.png").toExternalForm()),
-                new Image(getClass().getResource("/pictures/tile5.png").toExternalForm())
+                new Image(getClass().getResource("/pictures/tile5.png").toExternalForm()),
+                new Image(getClass().getResource("/pictures/flag.png").toExternalForm())
         );
 
         drawGameState();
+    }
+
+    public boolean hasWon(){
+        boolean result=true;
+        for(int x=1;x<X_TILES;x++)
+            for(int y=1;y<Y_TILES;y++){
+                Tile tile=grid[x][y];
+                if(tile.hasBomb && !tile.hasFlag)
+                    result=false;
+                if(!tile.hasBomb && tile.hasFlag)
+                    result=false;
+                if(!tile.hasBomb && !tile.isOpen)
+                    result=false;
+            }
+        return result;
     }
 
     public void revealAll(){
@@ -182,42 +197,51 @@ public class EasyGameController {
 
     public void click(int row, int col){
 
-        if(grid[row][col].isOpen)
-            return;
-        grid[row][col].isOpen=true;
-        if(grid[row][col].hasBomb){
-            gameResult.setText("GAME OVER :(");
-            revealAll();
-            finished=true;
+        if(flag)
+            grid[row][col].hasFlag=!grid[row][col].hasFlag;
+        else {
+            if (grid[row][col].isOpen || grid[row][col].hasFlag)
+                return;
+            grid[row][col].isOpen = true;
+            if (grid[row][col].hasBomb) {
+                gameResult.setText("GAME OVER :(");
+                revealAll();
+                finished = true;
+            }
+
+
+            if (grid[row][col].bombs == 0) {
+                if (row > 1 && col > 1) {
+                    click(row - 1, col - 1);
+                }
+                if (row > 1) {
+                    click(row - 1, col);
+                }
+                if (row > 1 && col < 9) {
+                    click(row - 1, col + 1);
+                }
+                if (col > 1) {
+                    click(row, col - 1);
+                }
+                if (col < 9) {
+                    click(row, col + 1);
+                }
+                if (row < 9 && col > 1) {
+                    click(row + 1, col - 1);
+                }
+                if (row < 9) {
+                    click(row + 1, col);
+                }
+                if (row < 9 && col < 9) {
+                    click(row + 1, col + 1);
+                }
+            }
         }
 
-
-
-        if(grid[row][col].bombs==0){
-            if(row>1 && col>1) {
-                click(row - 1, col - 1);
-            }
-            if(row>1) {
-                click(row - 1, col);
-            }
-            if(row>1 && col<9) {
-                click(row - 1, col + 1);
-            }
-            if(col>1){
-                click(row,col-1);
-            }
-            if(col<9){
-                click(row,col+1);
-            }
-            if(row<9 && col>1) {
-                click(row + 1, col - 1);
-            }
-            if(row<9) {
-                click(row + 1, col);
-            }
-            if(row<9 && col<9) {
-                click(row + 1, col + 1);
-            }
+        if (hasWon()){
+            gameResult.setText("YOU WON!");
+            drawGameState();
+            finished=true;
         }
 
     }
