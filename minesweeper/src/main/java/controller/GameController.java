@@ -8,12 +8,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import lombok.extern.slf4j.Slf4j;
 
 //import java.time.Instant;
-//import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class GameController {
 
     //private tileState gameState;
@@ -197,14 +198,20 @@ public class GameController {
 
     public void click(int row, int col){
 
-        if(flag && !grid[row][col].isOpen)
-            grid[row][col].hasFlag=!grid[row][col].hasFlag;
+        if(flag && !grid[row][col].isOpen) {
+            if(!grid[row][col].hasFlag)
+                log.info("Flagged tile at ({},{})",row,col);
+            else log.info("Removed flag from tile at ({},{})",row,col);
+            grid[row][col].hasFlag = !grid[row][col].hasFlag;
+        }
         else {
             if (grid[row][col].isOpen || grid[row][col].hasFlag)
                 return;
             grid[row][col].isOpen = true;
+            log.info("Reveal tile at ({},{})",row,col);
             if (grid[row][col].hasBomb) {
                 gameResult.setText("GAME OVER :(");
+                log.info("Player {} found a mine in {} steps.", userName, stepCount);
                 revealAll();
                 finished = true;
             }
@@ -240,6 +247,7 @@ public class GameController {
 
         if (hasWon()){
             gameResult.setText("YOU WON!");
+            log.info("Player {} solved the game in {} steps.", userName, stepCount);
             drawGameState();
             finished=true;
         }
@@ -255,12 +263,7 @@ public class GameController {
 
             stepCount++;
 
-            //if(grid[clickedRow][clickedColumn].isOpen)
-            //   return;
-
             click(clickedRow, clickedColumn);
-
-            //grid[clickedRow][clickedColumn].isOpen=true;
 
             drawGameState();
         }
@@ -272,6 +275,7 @@ public class GameController {
         gameResult.setText("");
         finished=false;
         drawGameState();
+        log.info("Game reset.");
     }
 
 }
