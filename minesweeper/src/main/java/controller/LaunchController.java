@@ -23,7 +23,6 @@ public class LaunchController {
 
     public void startAction(ActionEvent actionEvent) throws IOException {
         if (usernameTextfield.getText().isEmpty()) {
-            usernameTextfield.setText("Ede");
             errorLabel.setText("* Username is empty!");
         }else {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
