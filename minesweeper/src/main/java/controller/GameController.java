@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import results.GameResult;
 import results.GameResultDao;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,7 +28,6 @@ import java.util.List;
 @Slf4j
 public class GameController {
 
-    //private tileState gameState;
     private Instant beginGame;
     private String userName;
     private List<Image> TileImages;
@@ -37,6 +37,10 @@ public class GameController {
     public boolean finished;
     public boolean flag;
 
+    @Inject
+    private FXMLLoader fxmlLoader;
+
+    @Inject
     private GameResultDao gameResultDao;
 
     public Tile[][] grid= new Tile[X_TILES][Y_TILES];
@@ -167,8 +171,6 @@ public class GameController {
 
     @FXML
     public void initialize() {
-
-        gameResultDao = GameResultDao.getInstance();
 
         createContent();
 
@@ -335,15 +337,18 @@ public class GameController {
     }
 
     public void finishGame(ActionEvent actionEvent) throws IOException {
-        if (!hasWon()) {
-            gameResultDao.persist(getResult());
+        String buttonText = ((Button) actionEvent.getSource()).getText();
+        log.debug("{} is pressed", buttonText);
+        if (buttonText.equals("Give Up")) {
+            log.info("The game has been given up");
         }
 
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/highscores.fxml"));
+        log.info("Loading high scores scene...");
+        fxmlLoader.setLocation(getClass().getResource("/fxml/highscores.fxml"));
+        Parent root = fxmlLoader.load();
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.show();
-        log.info("Finished game, loading highscores scene.");
     }
 
 }

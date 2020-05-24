@@ -11,10 +11,14 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 @Slf4j
 public class LaunchController {
+
+    @Inject
+    private FXMLLoader fxmlLoader;
 
     @FXML
     private TextField usernameTextfield;
@@ -27,7 +31,7 @@ public class LaunchController {
         if (usernameTextfield.getText().isEmpty()) {
             errorLabel.setText("* Username is empty!");
         }else {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
+                fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
                 Parent root = fxmlLoader.load();
                 fxmlLoader.<GameController>getController().initdata(usernameTextfield.getText());
                 Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();

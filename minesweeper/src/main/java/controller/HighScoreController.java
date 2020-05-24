@@ -19,6 +19,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import results.GameResult;
 import results.GameResultDao;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -28,6 +29,12 @@ import java.util.List;
 
 @Slf4j
 public class HighScoreController {
+
+    @Inject
+    private FXMLLoader fxmlLoader;
+
+    @Inject
+    private GameResultDao gameResultDao;
 
     @FXML
     private TableView<GameResult> highScoreTable;
@@ -44,17 +51,6 @@ public class HighScoreController {
     @FXML
     private TableColumn<GameResult, ZonedDateTime> created;
 
-    private GameResultDao gameResultDao;
-
-    public void handleRestartButton(ActionEvent actionEvent) throws IOException {
-        log.debug("{} is pressed", ((Button) actionEvent.getSource()).getText());
-        log.info("Loading launch scene...");
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/launch.fxml"));
-        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.show();
-    }
-
     @FXML
     private void initialize() {
         log.debug("Loading high scores...");
@@ -70,10 +66,10 @@ public class HighScoreController {
                 @Override
                 protected void updateItem(Duration item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty) {
+                    if(empty) {
                         setText(null);
                     } else {
-                        setText(DurationFormatUtils.formatDuration(item.toMillis(), "H:mm:ss"));
+                        setText(DurationFormatUtils.formatDuration(item.toMillis(),"H:mm:ss"));
                     }
                 }
             };
@@ -83,11 +79,10 @@ public class HighScoreController {
         created.setCellFactory(column -> {
             TableCell<GameResult, ZonedDateTime> cell = new TableCell<GameResult, ZonedDateTime>() {
                 private DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG);
-
                 @Override
                 protected void updateItem(ZonedDateTime item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty) {
+                    if(empty) {
                         setText(null);
                     } else {
                         setText(item.format(formatter));
@@ -101,6 +96,15 @@ public class HighScoreController {
         observableResult.addAll(highScoreList);
 
         highScoreTable.setItems(observableResult);
+    }
 
+    public void handleRestartButton(ActionEvent actionEvent) throws IOException {
+        log.debug("{} is pressed", ((Button) actionEvent.getSource()).getText());
+        log.info("Loading launch scene...");
+        fxmlLoader.setLocation(getClass().getResource("/fxml/launch.fxml"));
+        Parent root = fxmlLoader.load();
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 }
