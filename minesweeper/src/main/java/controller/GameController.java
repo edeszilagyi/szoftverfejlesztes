@@ -2,15 +2,25 @@ package controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import results.GameResult;
+import results.GameResultDao;
 
-//import java.time.Instant;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,7 +28,7 @@ import java.util.List;
 public class GameController {
 
     //private tileState gameState;
-    //private Instant beginGame;
+    private Instant beginGame;
     private String userName;
     private List<Image> TileImages;
     private int stepCount;
@@ -26,6 +36,8 @@ public class GameController {
     private static final int Y_TILES=10;
     public boolean finished;
     public boolean flag;
+
+    private GameResultDao gameResultDao;
 
     public Tile[][] grid= new Tile[X_TILES][Y_TILES];
 
@@ -40,6 +52,9 @@ public class GameController {
 
     @FXML
     private Label gameResult;
+
+    @FXML
+    private Button doneButton;
 
     public void checkFlag(ActionEvent actionEvent) {
         flag=!flag;
@@ -60,6 +75,10 @@ public class GameController {
         }
     }
 
+    /**
+     * Fills the board with random mines, then if a tileis not
+     * mine then sets the number of mines near
+     */
     public void createContent(){
         for (int x=1; x<X_TILES; x++)
             for (int y=1; y<Y_TILES; y++) {
@@ -73,10 +92,16 @@ public class GameController {
                 if(tile.hasBomb)
                     continue;
                 grid[x][y].bombs=checkNeighbors(x,y);
-                //System.out.println(checkNeighbors(x,y));
             }
     }
 
+    /**
+     * Counts how many mines are near the given tile
+     *
+     * @param row the row of the tile
+     * @param col the column of the tile
+     * @return the number of mines near the tile
+     */
     private int checkNeighbors(int row,int col){
 
         int num=0;
@@ -142,13 +167,11 @@ public class GameController {
     @FXML
     public void initialize() {
 
+        gameResultDao = GameResultDao.getInstance();
+
         createContent();
 
-        //gameResultDao = GameResultDao.getInstance();
-
-        //gameState = new tileState();
-
-        //beginGame = Instant.now();
+        beginGame = Instant.now();
 
         finished =false;
 
@@ -172,6 +195,10 @@ public class GameController {
         drawGameState();
     }
 
+    /**
+     * Checks whether the player has won
+     * @return {@code true} if the player has won, {@code false} otherwise
+     */
     public boolean hasWon(){
         boolean result=true;
         for(int x=1;x<X_TILES;x++)
@@ -187,6 +214,9 @@ public class GameController {
         return result;
     }
 
+    /**
+     * Reveal the whole board
+     */
     public void revealAll(){
 
         for (int x = 1; x < X_TILES; x++)
@@ -196,6 +226,12 @@ public class GameController {
 
     }
 
+    /**
+     * Reveals the given tile
+     *
+     * @param row the row of the tile to be revealed
+     * @param col the column of the tile to be revealed
+     */
     public void click(int row, int col){
 
         if(flag && !grid[row][col].isOpen) {
@@ -248,11 +284,14 @@ public class GameController {
         if (hasWon()){
             gameResult.setText("YOU WON!");
             log.info("Player {} solved the game in {} steps.", userName, stepCount);
+            doneButton.setText("Finish");
+            gameResultDao.persist(getResult());
             drawGameState();
             finished=true;
         }
 
     }
+
 
     public void tileClick(MouseEvent mouseEvent) {
 
@@ -269,13 +308,41 @@ public class GameController {
         }
     }
 
+    /**
+     * Resets the game
+     * @param actionevent is the rest button
+     */
     public void resetGame(ActionEvent actionevent){
         createContent();
         stepCount=0;
         gameResult.setText("");
         finished=false;
         drawGameState();
+        beginGame = Instant.now();
         log.info("Game reset.");
+    }
+
+    private GameResult getResult() {
+
+        GameResult result = GameResult.builder()
+                .player(userName)
+                .solved(hasWon())
+                .duration(Duration.between(beginGame, Instant.now()))
+                .steps(stepCount)
+                .build();
+        return result;
+    }
+
+    public void finishGame(ActionEvent actionEvent) throws IOException {
+        if (!hasWon()) {
+            gameResultDao.persist(getResult());
+        }
+
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/highscores.fxml"));
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
+        log.info("Finished game, loading highscores scene.");
     }
 
 }

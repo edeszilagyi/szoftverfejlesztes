@@ -164,5 +164,6 @@
          </font>
       </Label>
       <CheckBox fx:id="flagButton" layoutX="71.0" layoutY="123.0" mnemonicParsing="false" onAction="#checkFlag" prefWidth="16.0" />
+      <Button fx:id="doneButton" layoutX="614.0" layoutY="311.0" mnemonicParsing="false" onAction="#finishGame" prefHeight="42.0" prefWidth="73.0" text="Give up" />
    </children>
 </Pane>
