@@ -60,18 +60,19 @@ public class GameController {
         flag=!flag;
     }
 
-    public class Tile{
+    public static class Tile{
         private int x,y;
         private boolean hasBomb;
         private boolean isOpen = false;
         private boolean hasFlag = false;
         private int bombs=0;
 
-        public Tile(int x,int y, boolean hasBomb){
+        public Tile(int x,int y, boolean hasBomb,boolean hasFlag,boolean isOpen){
             this.x=x;
             this.y=y;
             this.hasBomb=hasBomb;
-
+            this.hasFlag=hasFlag;
+            this.isOpen=isOpen;
         }
     }
 
@@ -82,7 +83,7 @@ public class GameController {
     public void createContent(){
         for (int x=1; x<X_TILES; x++)
             for (int y=1; y<Y_TILES; y++) {
-                Tile tile = new Tile(x, y, Math.random() < 0.1);
+                Tile tile = new Tile(x, y, Math.random() < 0.1,false,false);
                 grid[x][y] = tile;
             }
         for (int x=1; x<X_TILES; x++)

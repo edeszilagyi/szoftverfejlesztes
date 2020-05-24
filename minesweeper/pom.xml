@@ -9,8 +9,8 @@
     <version>1.0</version>
     <description>Minesweeper game</description>
     <scm>
-        <connection>https://github.com/edeszilagyi/szoftverfejlesztes/tree/master/minesweeper.git</connection>
-        <developerConnection>https://github.com/edeszilagyi/szoftverfejlesztes/tree/master/minesweeper.git</developerConnection>
+        <connection>scm:svn:https://github.com/edeszilagyi/szoftverfejlesztes/tree/master/minesweeper.git</connection>
+        <developerConnection>scm:svn:https://github.com/edeszilagyi/szoftverfejlesztes/tree/master/minesweeper.git</developerConnection>
     </scm>
 
     <developers>
