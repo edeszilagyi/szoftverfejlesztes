@@ -3,12 +3,14 @@ package results;
 import com.google.inject.persist.Transactional;
 import util.jpa.GenericJpaDao;
 
+import javax.persistence.Persistence;
 import java.util.List;
 
 /**
  * DAO class for the {@link GameResult} entity.
  */
 public class GameResultDao extends GenericJpaDao<GameResult> {
+
 
     public GameResultDao() {
         super(GameResult.class);

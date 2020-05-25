@@ -33,7 +33,6 @@ public class HighScoreController {
     @Inject
     private FXMLLoader fxmlLoader;
 
-    @Inject
     private GameResultDao gameResultDao;
 
     @FXML
@@ -54,6 +53,7 @@ public class HighScoreController {
     @FXML
     private void initialize() {
         log.debug("Loading high scores...");
+
         List<GameResult> highScoreList = gameResultDao.findBest(10);
 
         player.setCellValueFactory(new PropertyValueFactory<>("player"));

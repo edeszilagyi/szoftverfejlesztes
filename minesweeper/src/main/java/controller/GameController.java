@@ -344,7 +344,7 @@ public class GameController {
         }
 
         log.info("Loading high scores scene...");
-        fxmlLoader.setLocation(getClass().getResource("/fxml/highscores.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/highscores.fxml"));
         Parent root = fxmlLoader.load();
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         stage.setScene(new Scene(root));
